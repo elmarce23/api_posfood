@@ -5,7 +5,7 @@ const sql = require('mssql')
 const config = {
     user: 'sa',
     password: '12345678',
-    server: 'DESKTOP-UED60N8',
+    server: '[SERVER]',
     database: 'TACO_VENTA_POS',
     trustServerCertificate:true,
     options: {

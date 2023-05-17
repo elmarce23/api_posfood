@@ -1,5 +1,48 @@
 //const TYPE_OF_DB = process.openStdin();
 
+const sql = require('mssql')
+
+const config = {
+    user: 'sa',
+    password: '12345678',
+    server: 'DESKTOP-UED60N8',
+    database: 'TACO_VENTA_POS',
+    trustServerCertificate:true,
+    options: {
+        encrypt: true // Usa la encriptación para mayor seguridad
+    }
+}
+
+//const pool = new sql.ConnectionPool(config)
+
+sql.connect(config, err => {
+  if (err) {
+    console.log('Error al conectarse a la base de datos:', err)
+  } else {
+    // Consulta SQL
+    const consulta = 'SELECT * FROM ordenes'
+
+    // Ejecutar consulta
+    new sql.Request().query(consulta, (err, result) => {
+      if (err) {
+        console.log('Error al ejecutar la consulta:', err)
+      } else {
+        console.log('Resultados de la consulta:', result.recordset)
+      }
+      sql.close()
+    })
+  }
+})
+
+/*
+pool.connect().then(() => {
+    console.log('Conexión exitosa a SQL Server')
+}).catch(err => {
+    console.log('Error al conectarse a SQL Server \n', err)
+})
+*/
+
+/*
 const express = require("express");
 const mysql = require("mysql");
 
@@ -113,3 +156,4 @@ app.delete("/usuarios/:id", (req, res) => {
 app.listen(port, () => {
   console.log(`API Rest ejecutándose en http://localhost:${port}`);
 });
+*/

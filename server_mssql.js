@@ -1,10 +1,10 @@
 const sql = require('mssql')
 
 const config = {
-    user: '<usuario>',
-    password: '<contraseña>',
-    server: '<servidor>',
-    database: '<base de datos>',
+    user: 'sa',
+    password: '12345678',
+    server: 'DESKTOP-UED60N8',
+    database: 'TACO_VENTA_POS',
     options: {
         encrypt: true // Usa la encriptación para mayor seguridad
     }

@@ -3,10 +3,13 @@ const express = require('express')
 const sql = require('mssql')
 const port = 3_000
 
+const app = express()
+app.use(express.json())
+
 const config = {
     user: 'sa',
     password: '12345678',
-    server: '[SERVER]',
+    server: 'DESKTOP-UED60N8',
     database: 'TACO_VENTA_POS',
     trustServerCertificate:true,
     options: {
@@ -21,7 +24,7 @@ app.post('/personal', async (req, res) => {
   try {
     await sql.connect(config)
     const { nombre, rol, activo } = req.body
-    const query = `INSERT INTO personal (nombre, rol, Activo) VALUES ('${nombre}', ${rol}, ${activo})`
+    const query = `INSERT INTO personal (id, nombre, rol, Activo) VALUES (${id}, '${nombre}', ${rol}, ${activo})`
     await sql.query(query)
     console.log('Registro creado con éxito')
     res.sendStatus(201)
@@ -31,7 +34,7 @@ app.post('/personal', async (req, res) => {
   } finally {
     sql.close()
   }
-})
+});
 
 // Obtener todos los registros de la tabla "personal"
 app.get('/personal', async (req, res) => {
@@ -47,7 +50,28 @@ app.get('/personal', async (req, res) => {
   } finally {
     sql.close()
   }
-})
+});
+
+// Obtener un registro de "personal"
+app.get('/personal/:cv_personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const cv_personal = req.params.cv_personal
+    const query = `SELECT * FROM personal WHERE cv_personal = ${cv_personal}`
+    const result = await sql.query(query)
+    if (result.recordset.length > 0) {
+      console.log('Registro obtenido:', result.recordset[0])
+      res.json(result.recordset[0])
+    } else {
+      res.sendStatus(404)
+    }
+  } catch (error) {
+    console.log('Error al obtener el registro:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
 
 // Actualizar un registro en la tabla "personal"
 app.put('/personal/:cv_personal', async (req, res) => {
@@ -65,7 +89,7 @@ app.put('/personal/:cv_personal', async (req, res) => {
   } finally {
     sql.close()
   }
-})
+});
 
 // Eliminar un registro en la tabla "personal"
 app.delete('/personal/:cv_personal', async (req, res) => {
@@ -82,12 +106,62 @@ app.delete('/personal/:cv_personal', async (req, res) => {
   } finally {
     sql.close()
   }
-})
+});
+
+/* **** ROLES **** */
+// Obttencion de roles
+app.get('/rol', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM roles'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obttencion de mesas
+app.get('/mesas', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM mesas'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obttencion de tipos_productos
+app.get('/tiposprod', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM tipo_prod'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
 
 // Iniciar el servidor en puerto 3000
-app.listen(port, () => {
+app.listen(3000, () => {
   console.log('Servidor iniciado en el puerto 3000')
-})
+});
 
 /*
 pool.connect().then(() => {

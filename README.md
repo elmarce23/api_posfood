@@ -3,4 +3,5 @@ API for a POS Restaurants and Grocery Stores
 
 
 # comment
-Mi primer push
+
+All development are in localhost, and keys are FAKE...

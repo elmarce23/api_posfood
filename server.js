@@ -1,6 +1,7 @@
 //const TYPE_OF_DB = process.openStdin();
-
+const express = require('express')
 const sql = require('mssql')
+const port = 3_000
 
 const config = {
     user: 'sa',
@@ -15,23 +16,77 @@ const config = {
 
 //const pool = new sql.ConnectionPool(config)
 
-sql.connect(config, err => {
-  if (err) {
-    console.log('Error al conectarse a la base de datos:', err)
-  } else {
-    // Consulta SQL
-    const consulta = 'SELECT * FROM ordenes'
-
-    // Ejecutar consulta
-    new sql.Request().query(consulta, (err, result) => {
-      if (err) {
-        console.log('Error al ejecutar la consulta:', err)
-      } else {
-        console.log('Resultados de la consulta:', result.recordset)
-      }
-      sql.close()
-    })
+// Crear un registro en la tabla "personal"
+app.post('/personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const { nombre, rol, activo } = req.body
+    const query = `INSERT INTO personal (nombre, rol, Activo) VALUES ('${nombre}', ${rol}, ${activo})`
+    await sql.query(query)
+    console.log('Registro creado con éxito')
+    res.sendStatus(201)
+  } catch (error) {
+    console.log('Error al crear el registro:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
   }
+})
+
+// Obtener todos los registros de la tabla "personal"
+app.get('/personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM personal'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+})
+
+// Actualizar un registro en la tabla "personal"
+app.put('/personal/:cv_personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const cv_personal = req.params.cv_personal
+    const { nombre, rol, activo } = req.body
+    const query = `UPDATE personal SET nombre = '${nombre}', rol = ${rol}, Activo = ${activo} WHERE cv_personal = ${cv_personal}`
+    await sql.query(query)
+    console.log('Registro actualizado con éxito')
+    res.sendStatus(200)
+  } catch (error) {
+    console.log('Error al actualizar el registro:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+})
+
+// Eliminar un registro en la tabla "personal"
+app.delete('/personal/:cv_personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const cv_personal = req.params.cv_personal
+    const query = `DELETE FROM personal WHERE cv_personal = ${cv_personal}`
+    await sql.query(query)
+    console.log('Registro eliminado con éxito')
+    res.sendStatus(200)
+  } catch (error) {
+    console.log('Error al eliminar el registro:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+})
+
+// Iniciar el servidor en puerto 3000
+app.listen(port, () => {
+  console.log('Servidor iniciado en el puerto 3000')
 })
 
 /*

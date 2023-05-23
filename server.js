@@ -1,16 +1,16 @@
 //const TYPE_OF_DB = process.openStdin();
 const express = require('express')
 const sql = require('mssql')
-const multer = require('multer');
+//const multer = require('multer');
 
 const app = express()
-const upload = multer(); // Configurar multer
+//const upload = multer(); // Configurar multer
 
 app.use(express.json())
 
 const config = {
-    user: 'sa',
-    password: '12345678',
+    user: 'prod',
+    password: 'prod123',
     server: 'DESKTOP-UED60N8',
     database: 'TACO_VENTA_POS',
     trustServerCertificate:true,
@@ -19,12 +19,14 @@ const config = {
     }
 }
 
-//const pool = new sql.ConnectionPool(config)
 // Iniciar el servidor en puerto 3000
 app.listen(3000, () => {
   console.log('Servidor iniciado en el puerto 3000')
 });
 
+////////////////////////////////////////////////////////////////
+
+/* MODULE PERSONAL */
 
 // Crear un registro en la tabla "personal"
 app.post('/personal', upload.none(), async (req, res) => {
@@ -60,28 +62,12 @@ app.post('/personal', upload.none(), async (req, res) => {
   }
 });
 
-// Obtener todos los registros de la tabla "personal"
-app.get('/personal', async (req, res) => {
-  try {
-    await sql.connect(config)
-    const query = 'SELECT * FROM personal'
-    const result = await sql.query(query)
-    console.log('Registros obtenidos:', result.recordset)
-    res.json(result.recordset)
-  } catch (error) {
-    console.log('Error al obtener los registros:', error)
-    res.sendStatus(500)
-  } finally {
-    sql.close()
-  }
-});
-
 // Obtener un registro de "personal"
 app.get('/personal/:cv_personal', async (req, res) => {
   try {
     await sql.connect(config)
     const cv_personal = req.params.cv_personal
-    const query = `SELECT * FROM personal WHERE cv_personal = ${cv_personal}`
+    const query = `SELECT * FROM personal WHERE cv_personal = ${cv_personal}`;
     const result = await sql.query(query)
     if (result.recordset.length > 0) {
       console.log('Registro obtenido:', result.recordset[0])
@@ -98,7 +84,7 @@ app.get('/personal/:cv_personal', async (req, res) => {
 });
 
 // Actualizar un registro en la tabla "personal"
-app.put('/personal/:cv_personal', async (req, res) => {
+app.put('/personal/:cv_personal', upload.none(), async (req, res) => {
   try {
     await sql.connect(config)
     const cv_personal = req.params.cv_personal
@@ -115,7 +101,30 @@ app.put('/personal/:cv_personal', async (req, res) => {
   }
 });
 
-/* **** ROLES **** */
+////////////////////////////////////////////////////////////////
+
+/* PRODUCTOS */
+
+// Obtencion de productos por descripcion (LIKE)
+app.get('/productos/:decripcion', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const desc = req.params.decripcion;
+    const query = `SELECT * FROM productos WHERE desc_p LIKE '%${desc}%';`;
+    const result = await sql.query(query);
+    console.log('Registros obtenidos:', result.recordset);
+    res.json(result.recordset);
+  } catch (error) {
+    console.log('Error al obtener los registros:', error);
+    res.sendStatus(500);
+  } finally {
+    sql.close()
+  }
+});
+
+////////////////////////////////////////////////////////////////
+
+/* CATALOGOS */
 // Obttencion de roles
 app.get('/rol', async (req, res) => {
   try {
@@ -148,11 +157,107 @@ app.get('/mesas', async (req, res) => {
   }
 });
 
+// Obtiene los diferentes productos (sin filtros)
+app.get('/productos', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM productos;'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
 // Obttencion de tipos_productos
 app.get('/tiposprod', async (req, res) => {
   try {
     await sql.connect(config)
     const query = 'SELECT * FROM tipo_prod'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obtencion de ingredientes
+app.get('/ingredientes', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM ingredientes'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obtencion de recetas
+app.get('/recetas', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM recetas'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obtencion de personal
+app.get('/personal', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM personal'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obtencion de comandas
+app.get('/comandas', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM comandas'
+    const result = await sql.query(query)
+    console.log('Registros obtenidos:', result.recordset)
+    res.json(result.recordset)
+  } catch (error) {
+    console.log('Error al obtener los registros:', error)
+    res.sendStatus(500)
+  } finally {
+    sql.close()
+  }
+});
+
+// Obtencion de ordenes
+app.get('/ordenes', async (req, res) => {
+  try {
+    await sql.connect(config)
+    const query = 'SELECT * FROM ordenes'
     const result = await sql.query(query)
     console.log('Registros obtenidos:', result.recordset)
     res.json(result.recordset)
